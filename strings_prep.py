@@ -9,6 +9,10 @@ Python Coding Challenges on Strings
 6.Write a function in Python to convert a decimal to a hex. It must accept a string of ASCII characters as input. The function should return the value of each character as a hexadecimal string. You have to separate each byte by a space and return all alpha hexadecimal characters as lowercase.
 7.Write a code in Python to find out whether a given string S is a valid regex or not.
 """
+import datetime
+import socket
+import re
+
 # Morse Code Dictionary
 MORSE_CODE_DICT = {
     'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....',
@@ -63,14 +67,14 @@ def morse_code_to_text(word):
     return ' '.join(decoded_word)
 
 
-def detect_date(month, year):
+def detect_friday_13(month, year):
     """
     Detect 13th Friday. The function can accept two parameters, and both will be numbers.
     The first parameter will be the number indicating the month, and the second will be the year in four digits.
 
     :return : True when the month contains a Friday with the 13th, else return False.
     """
-    # TODO
+    return datetime.date(year, month, 13).weekday() == 4
 
 
 def detect_domain_name(ip_address):
@@ -80,7 +84,10 @@ def detect_domain_name(ip_address):
     :return : the domain name that maps to that IP address while using records of PTR DNS. You can import the Python socket library.
 
     """
-    # TODO
+    try:
+        return socket.gethostbyaddr(ip_address)[0]
+    except socket.herror:
+        return "No domain find for this ip"
 
 
 def parse_encoded_string(encoded_string):
@@ -92,24 +99,43 @@ def parse_encoded_string(encoded_string):
 
     :return : dict
     """
-    # TODO
+
+    match = re.search(r"([^\w\d]+)", encoded_string)
+    sep = match.group(1) if match else None
+    print(sep)
+    if not sep:
+        return "Invalid input parameter "
+
+    parts = encoded_string.split(sep)
+    if len(parts) < 3:
+        return "Invalid input parameter"
+    return {"first_name": parts[0],
+            "last_name" : parts[1],
+            "id" : sep.join(parts[2:])}
 
 
-def convert_dec_to_hex():
+def convert_dec_to_hex(ascii_char):
     """
     Function in Python to convert a decimal to a hex. It must accept a string of ASCII characters as input.
     The function should return the value of each character as a hexadecimal string.
     You have to separate each byte by a space and return all alpha hexadecimal characters as lowercase.
 
     """
-    # TODO
+    # for octal
+    #  ' '.join(format(ord(char),'03o') for char in ascii_char)
+    return ' '.join(format(ord(char),'02x') for char in ascii_char)
 
 
-def check_valid_regex():
+
+def check_valid_regex(s):
     """
     Function to find out whether a given string S is a valid regex or not.
     """
-    # TODO
+    try:
+        re.compile(s)
+        return True
+    except re.error:
+        return False
 
     
 if __name__ == '__main__':
@@ -120,4 +146,13 @@ if __name__ == '__main__':
     print(morse_code)
     morse_text = morse_code_to_text(".... . .-.. .-.. --- / .-- --- .-. .-.. -..")
     print(morse_text)
+    is_friday = detect_friday_13(5, 1994)
+    print(is_friday)
+    dns_name = detect_domain_name('127.56.1.3')
+    print(dns_name)
+    enc_word = parse_encoded_string("John000Doe000123")
+    print(enc_word)
+    hex_value = convert_dec_to_hex("Hi!")
+    print(hex_value)
+    print(check_valid_regex(r"^[a-z]+$"))
     
